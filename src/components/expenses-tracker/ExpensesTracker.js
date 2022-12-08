@@ -2,44 +2,56 @@ import React, { useState, useEffect } from "react";
 import "./ExpnensesTracker.css";
 export const ExpensesTracker = () => {
   const [list, setList] = useState([]);
-  const [name, setName] = useState("");
-  const [amount, setAmount] = useState(0);
-  const [catagory, setCategory] = useState("");
   const [count, setcount] = useState(0);
-  const [shoptype, setShoptype] = useState(25);
-  const [foodtype, setFoodtype] = useState(25);
-  const [travType, settravType] = useState(25);
-  const [otherType, setotherType] = useState(25);
+  const [obj, setObj] = useState({name:'', amount: 0, catagory: ''})
+  const [shareObj, setShareObj] = useState({shopType: 25, foodType: 25, travType: 25, otherType: 25})
+  // const [name, setName] = useState("");
+  // const [amount, setAmount] = useState(0);
+  // const [catagory, setCategory] = useState("");
+  // const [shoptype, setShoptype] = useState(25);
+  // const [foodtype, setFoodtype] = useState(25);
+  // const [travType, settravType] = useState(25);
+  // const [otherType, setotherType] = useState(25);
+  const formChangeHandler = (e) => {
+    e.persist()
+    if(e.target !== null){
+      const value = e.target.value
+      setObj((prev)=> {
+        return{
+          ...prev,
+          [e.target.name]: value
+        }
+      })
 
-  let expensesTotal = 0;
-  let shopExpense = 0;
-  let other = 0;
-  let traval = 0;
-  let food = 0;
+    }
+  }
 
-  const changeHandler = (e) => {
-    e.preventDefault();
-    console.log(e.target);
-    if (e.target !== null) {
-      setName(e.target.value);
-    }
-  };
-  const changeHandlerAmount = (e) => {
-    e.preventDefault();
-    console.log(e.target);
-    if (e.target !== null) {
-      setAmount(e.target.value);
-    }
-  };
-  const selectHandler = (e) => {
-    e.preventDefault();
-    console.log(e.target);
-    if (e.target !== null) {
-      setCategory(e.target.value);
-    }
-  };
+  // const changeHandler = (e) => {
+  //   e.preventDefault();
+  //   if (e.target !== null) {
+  //     setName(e.target.value);
+  //   }
+  // };
+  // const changeHandlerAmount = (e) => {
+  //   e.preventDefault();
+  //   if (e.target !== null) {
+  //     setAmount(e.target.value);
+  //   }
+  // };
+  // const selectHandler = (e) => {
+  //   e.preventDefault();
+  //   if (e.target !== null) {
+  //     setCategory(e.target.value);
+  //   }
+  // };
 
   const breakfn = () => {
+    let expensesTotal = 0;
+    let shopExpense = 0;
+    let other = 0;
+    let traval = 0;
+    let food = 0;
+
     list.map((el) => {
       expensesTotal += Number(el.amount);
       if (el.catagory === "Food") {
@@ -52,25 +64,31 @@ export const ExpensesTracker = () => {
         other += Number(el.amount);
       }
     });
-    setFoodtype(Math.floor((food / expensesTotal) * 100));
-    setShoptype(Math.floor((shopExpense / expensesTotal) * 100));
-    settravType(Math.floor((traval / expensesTotal) * 100));
-    setotherType(Math.floor((other / expensesTotal) * 100));
+    setShareObj({
+      foodType: Math.floor((food / expensesTotal) * 100),
+      shopType: Math.floor((shopExpense / expensesTotal) * 100),
+      travType: Math.floor((traval / expensesTotal) * 100),
+      otherType: Math.floor((other / expensesTotal) * 100)
+    });
+    // setFoodtype(Math.floor((food / expensesTotal) * 100));
+    // setShoptype(Math.floor((shopExpense / expensesTotal) * 100));
+    // settravType(Math.floor((traval / expensesTotal) * 100));
+    // setotherType(Math.floor((other / expensesTotal) * 100));
   };
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (name === "") {
+    if (obj.name === "") {
       return alert("Expense Name required");
-    } else if (amount <= 0) {
+    } else if (obj.amount <= 0) {
       return alert("Expense Amount required and should be greater than 0");
-    } else if (catagory === "") {
+    } else if (obj.catagory === "") {
       return alert("Please Choose Expense Type");
     } else {
       const initialState = {
         srNo: count - 1,
-        name,
-        amount,
-        catagory,
+        name: obj.name,
+        amount: obj.amount,
+        catagory: obj.catagory,
       };
       setList((prev) => {
         return [...prev, initialState];
@@ -93,8 +111,8 @@ export const ExpensesTracker = () => {
           >
             <input
               type="text"
-              value={name}
-              onChange={changeHandler}
+              value={obj.name}
+              onChange={formChangeHandler}
               placeholder="New Expense"
               style={{ width: "40%", marginRight: "10px" }}
               name="name"
@@ -102,20 +120,20 @@ export const ExpensesTracker = () => {
             />
             <input
               type="number"
-              value={amount}
-              onChange={changeHandlerAmount}
+              value={obj.amount}
+              onChange={formChangeHandler}
               placeholder="Enter Amount"
               style={{ width: "40%" }}
               name="amount"
               data-testid="expense-amount"
             />
             <select
-              onChange={selectHandler}
+              onChange={formChangeHandler}
               className="ml-2"
               name="catagory"
               data-testid="expense-type"
             >
-              <option value={catagory}>Select Type</option>
+              <option value={obj.catagory}>Select Type</option>
               <option data-testid="expense-type-1" value={"Food"}>
                 Food
               </option>
@@ -172,22 +190,22 @@ export const ExpensesTracker = () => {
           <div style={{ height: "30px", display: "flex" }}>
             <div
               data-testid="expense-distribution-food"
-              style={{ width: `${foodtype}%` }}
+              style={{ width: `${shareObj.foodType}%` }}
               className="lightblue"
             ></div>
             <div
               data-testid="expense-distribution-travel"
-              style={{ width: `${travType}%` }}
+              style={{ width: `${shareObj.travType}%` }}
               className="red"
             ></div>
             <div
               data-testid="expense-distribution-shopping"
-              style={{ width: `${shoptype}%` }}
+              style={{ width: `${shareObj.shopType}%` }}
               className="lightgreen"
             ></div>
             <div
               data-testid="expense-distribution-other"
-              style={{ width: `${otherType}%` }}
+              style={{ width: `${shareObj.otherType}%` }}
               className="orange"
             ></div>
           </div>
